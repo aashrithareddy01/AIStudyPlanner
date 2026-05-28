@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Study Planner</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      background: linear-gradient(to right,#141e30,#243b55);
+      color:white;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:700px;
+      background:rgba(255,255,255,0.1);
+      padding:30px;
+      border-radius:20px;
+      backdrop-filter: blur(10px);
+      box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    label{
+      display:block;
+      margin-top:15px;
+      margin-bottom:5px;
+      font-weight:bold;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      outline:none;
+      font-size:16px;
+    }
+
+    button{
+      width:100%;
+      margin-top:20px;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      background:#00c6ff;
+      color:white;
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:#0072ff;
+    }
+
+    .output{
+      margin-top:25px;
+      background:rgba(255,255,255,0.15);
+      padding:20px;
+      border-radius:15px;
+    }
+
+    .day{
+      margin-top:15px;
+      padding:10px;
+      background:rgba(0,0,0,0.2);
+      border-radius:10px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>📚 AI Study Planner</h1>
+
+  <label>Enter Subjects</label>
+  <input type="text" id="subjects" placeholder="Math, Java, DSA">
+
+  <label>Weak Subject</label>
+  <input type="text" id="weak" placeholder="DSA">
+
+  <label>Exam Date</label>
+  <input type="date" id="examDate">
+
+  <button onclick="generatePlan()">Generate Study Plan</button>
+
+  <div class="output" id="output">
+    Your timetable will appear here...
+  </div>
+
+</div>
+
+<script>
+
+function generatePlan(){
+
+  let subjects = document.getElementById("subjects").value.split(",");
+  let weak = document.getElementById("weak").value.toLowerCase();
+  let examDate = new Date(document.getElementById("examDate").value);
+
+  let today = new Date();
+
+  let diffTime = examDate - today;
+
+  let daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  let output = document.getElementById("output");
+
+  if(daysLeft <= 0){
+    output.innerHTML = "Please select a future date";
+    return;
+  }
+
+  let plan = `<h2>Your AI Study Plan</h2>`;
+  plan += `<p>Days Left: ${daysLeft}</p>`;
+
+  for(let i = 1; i <= daysLeft; i++){
+
+    let subject = subjects[i % subjects.length].trim();
+
+    if(subject.toLowerCase() === weak){
+      subject += " 🔥 Extra Focus";
+    }
+
+    plan += `
+      <div class="day">
+        <h3>Day ${i}</h3>
+        <p>Study: ${subject}</p>
+        <p>Time: 2-3 Hours</p>
+      </div>
+    `;
+  }
+
+  output.innerHTML = plan;
+}
+
+</script>
+
+</body>
+</html>
