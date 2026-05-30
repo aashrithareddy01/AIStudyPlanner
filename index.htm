@@ -11,22 +11,22 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
     background:linear-gradient(to right,#141e30,#243b55);
-    color:white;
     min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     padding:20px;
+    color:white;
 }
 
 .container{
     width:100%;
-    max-width:700px;
+    max-width:750px;
     background:rgba(255,255,255,0.1);
     padding:30px;
     border-radius:20px;
@@ -57,8 +57,8 @@ input{
 
 button{
     width:100%;
-    margin-top:20px;
     padding:14px;
+    margin-top:20px;
     border:none;
     border-radius:10px;
     background:#00c6ff;
@@ -85,6 +85,39 @@ button:hover{
     border-radius:10px;
 }
 
+.progress-container{
+    width:100%;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+    margin:10px 0;
+}
+
+.progress-bar{
+    height:25px;
+    background:#00c6ff;
+    color:white;
+    text-align:center;
+    line-height:25px;
+    font-weight:bold;
+    width:0%;
+    transition:0.5s;
+}
+
+#progressText{
+    margin-top:10px;
+    font-weight:bold;
+}
+
+.complete-btn{
+    margin-top:15px;
+    background:#28a745;
+}
+
+.complete-btn:hover{
+    background:#218838;
+}
+
 </style>
 </head>
 
@@ -95,10 +128,10 @@ button:hover{
     <h1> AI Study Planner</h1>
 
     <label>Enter Subjects</label>
-    <input type="text" id="subjects" placeholder="Java, DSA, DBMS">
+    <input type="text" id="subjects" placeholder="DBMS,ML,CD">
 
     <label>Weak Subject</label>
-    <input type="text" id="weakSubject" placeholder="DSA">
+    <input type="text" id="weakSubject" placeholder="CD">
 
     <label>Exam Date</label>
     <input type="date" id="examDate">
@@ -108,12 +141,15 @@ button:hover{
     </button>
 
     <div class="output" id="result">
-        Your study plan will appear here...
+        Your timetable will appear here...
     </div>
 
 </div>
 
 <script>
+
+let totalDays = 0;
+let completedDays = 0;
 
 function createStudyPlan(){
 
@@ -135,35 +171,55 @@ function createStudyPlan(){
     let today = new Date();
 
     let remainingDays = Math.ceil(
-        (examDate - today) / (1000 * 60 * 60 * 24)
+        (examDate - today) / (1000*60*60*24)
     );
 
     let resultBox = document.getElementById("result");
 
     if(remainingDays <= 0){
         resultBox.innerHTML =
-        " Please select a valid future exam date.";
+        "⚠ Please select a future exam date.";
         return;
     }
 
+    totalDays = remainingDays;
+    completedDays = 0;
+
     let studyTips = [
         "Revise important concepts.",
-        "Practice previous year questions.",
-        "Take short notes while studying.",
-        "Focus on understanding, not memorizing.",
-        "Solve at least 10 practice questions.",
-        "Take a short break after every hour."
+        "Practice previous year papers.",
+        "Take short notes.",
+        "Focus on weak topics.",
+        "Solve MCQs today.",
+        "Take breaks while studying."
     ];
 
     let studyPlan = `
-        <h2> Your Personalized Study Plan</h2>
+        <h2> Your AI Study Plan</h2>
         <p><strong>Days Left:</strong> ${remainingDays}</p>
+
+        <h3>Progress Tracker</h3>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                0%
+            </div>
+        </div>
+
+        <p id="progressText">
+            Completed Days: 0 / ${totalDays}
+        </p>
+
+        <button class="complete-btn"
+                onclick="markCompleted()">
+            ✔ Mark Day Completed
+        </button>
     `;
 
     for(let day = 1; day <= remainingDays; day++){
 
         let currentSubject =
-            subjectList[day % subjectList.length].trim();
+        subjectList[day % subjectList.length].trim();
 
         let studyHours = "2-3 Hours";
 
@@ -175,28 +231,65 @@ function createStudyPlan(){
             studyHours = "4-5 Hours";
         }
 
-        let note = "";
+        let suggestion = "";
 
         if(currentSubject.toLowerCase() === weakSubject){
-            note = "Give extra attention to this subject.";
+            suggestion =
+            "Extra attention required for this subject.";
         }
         else{
-            note = studyTips[
-                Math.floor(Math.random() * studyTips.length)
-            ];
+            suggestion =
+            studyTips[Math.floor(
+                Math.random()*studyTips.length
+            )];
         }
 
         studyPlan += `
         <div class="day-card">
             <h3>Day ${day}</h3>
-            <p><strong>Subject:</strong> ${currentSubject}</p>
-            <p><strong>Study Time:</strong> ${studyHours}</p>
-            <p><strong>Suggestion:</strong> ${note}</p>
+
+            <p>
+                <strong>Subject:</strong>
+                ${currentSubject}
+            </p>
+
+            <p>
+                <strong>Study Time:</strong>
+                ${studyHours}
+            </p>
+
+            <p>
+                <strong>AI Suggestion:</strong>
+                ${suggestion}
+            </p>
         </div>
         `;
     }
 
     resultBox.innerHTML = studyPlan;
+}
+
+function markCompleted(){
+
+    if(completedDays < totalDays){
+
+        completedDays++;
+
+        let percentage =
+        Math.round(
+            (completedDays / totalDays) * 100
+        );
+
+        document.getElementById("progressBar")
+        .style.width = percentage + "%";
+
+        document.getElementById("progressBar")
+        .innerHTML = percentage + "%";
+
+        document.getElementById("progressText")
+        .innerHTML =
+        `Completed Days: ${completedDays} / ${totalDays}`;
+    }
 }
 
 </script>
